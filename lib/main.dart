@@ -6,7 +6,6 @@ import 'services/auth_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/forgot_password_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/boards_screen.dart';
@@ -47,7 +46,6 @@ class PinterestApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-          '/forgot-password': (context) => const ForgotPasswordScreen(),
           '/home': (context) => const HomeScreen(),
           '/search': (context) => const SearchScreen(),
           '/profile': (context) => const ProfileScreen(),
@@ -76,14 +74,14 @@ class _SplashScreenState extends State<SplashScreen> {
     // Initialize services
     final pinterestProvider = Provider.of<PinterestProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
-    
+
     // Initialize both services and wait for 3 seconds minimum
     await Future.wait([
       pinterestProvider.initialize(),
       authService.initialize(),
       Future.delayed(const Duration(seconds: 3)),
     ]);
-    
+
     if (mounted) {
       // Navigate based on authentication status
       if (authService.isLoggedIn) {
