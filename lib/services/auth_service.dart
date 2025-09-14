@@ -55,7 +55,7 @@ class AuthService extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString('current_user');
-      
+
       if (userJson != null) {
         final userData = json.decode(userJson);
         _currentUser = AuthUser.fromJson(userData);
@@ -89,7 +89,7 @@ class AuthService extends ChangeNotifier {
       }
 
       _currentUser = AuthUser.fromJson(userMap);
-      
+
       // Save to shared preferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('current_user', json.encode(_currentUser!.toJson()));
@@ -105,7 +105,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<bool> register(String email, String password, String name, String username) async {
+  Future<bool> register(String email, String password, String name) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -177,11 +177,11 @@ class AuthService extends ChangeNotifier {
 
   Future<void> logout() async {
     _currentUser = null;
-    
+
     // Clear from shared preferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('current_user');
-    
+
     notifyListeners();
   }
 
@@ -196,7 +196,7 @@ class AuthService extends ChangeNotifier {
 
       // Check if email exists
       final userExists = _mockUsers.any((user) => user['email'] == email);
-      
+
       if (!userExists) {
         _errorMessage = 'Email not found';
         _isLoading = false;

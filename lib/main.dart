@@ -11,11 +11,11 @@ import 'screens/profile_screen.dart';
 import 'screens/boards_screen.dart';
 
 void main() {
-  runApp(const PinterestApp());
+  runApp(const StrayApp());
 }
 
-class PinterestApp extends StatelessWidget {
-  const PinterestApp({super.key});
+class StrayApp extends StatelessWidget {
+  const StrayApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class PinterestApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AuthService()),
       ],
       child: MaterialApp(
-        title: 'Pinterest',
+        title: '周小失物认领',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.red,
@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.blue,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Image.asset(
-                  'assets/images/pinterest-emblem.png',
+                  'assets/images/stray-icon.png',
                   width: 56,
                   height: 56,
                   fit: BoxFit.contain,
@@ -123,7 +123,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Pinterest',
+              '周小失物认领',
               style: GoogleFonts.inter(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Welcome Text
                 Text(
-                  '欢迎使用失物认领程序',
+                  '欢迎使用失物认领',
                   style: GoogleFonts.inter(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -129,14 +129,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red, width: 2),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey[50],
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入您的邮箱地址';
+                      return '请输入邮箱地址';
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                       return '请输入一个有效的邮箱地址';
@@ -176,14 +176,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.red, width: 2),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey[50],
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入您的密码';
+                      return '请输入密码';
                     }
                     if (value.length < 6) {
                       return '密码必须大于6个字符';
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _rememberMe = value ?? false;
                             });
                           },
-                          activeColor: Colors.red,
+                          activeColor: Colors.blue,
                         ),
                         const Text('记住我'),
                       ],
@@ -253,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         '注册',
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

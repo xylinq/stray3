@@ -1,5 +1,5 @@
-name: pinterest
-description: "A new Flutter project."
+name: stray
+description: "周浦小学失物认领程序, 由五(4)班张时嘉开发"
 publish_to: 'none'
 version: 0.1.0
 
@@ -14,12 +14,13 @@ dependencies:
   provider: ^6.1.1
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.4
+  http: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
