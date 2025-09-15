@@ -1,7 +1,6 @@
 class User {
   final String id;
   final String name;
-  final String username;
   final String bio;
   final String avatar;
   final int followers;
@@ -13,7 +12,6 @@ class User {
   User({
     required this.id,
     required this.name,
-    required this.username,
     required this.bio,
     required this.avatar,
     required this.followers,
@@ -27,7 +25,6 @@ class User {
     return User(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      username: json['username'] ?? '',
       bio: json['bio'] ?? '',
       avatar: json['avatar'] ?? '',
       followers: json['followers'] ?? 0,
@@ -42,7 +39,6 @@ class User {
     return {
       'id': id,
       'name': name,
-      'username': username,
       'bio': bio,
       'avatar': avatar,
       'followers': followers,

@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/auth_user.dart';
+import 'api_service.dart';
 
 class AuthService extends ChangeNotifier {
+  final _apiService = ApiService();
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
@@ -24,7 +26,6 @@ class AuthService extends ChangeNotifier {
       'email': 'demo@pinterest.com',
       'password': 'password123',
       'name': 'Demo User',
-      'username': '@demouser',
       'avatar': 'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=200&h=200&fit=crop&crop=face',
       'bio': 'Welcome to Pinterest clone!',
       'followers': 1234,
@@ -39,7 +40,6 @@ class AuthService extends ChangeNotifier {
       'email': 'sarah@email.com',
       'password': 'sarah123',
       'name': 'Sarah Johnson',
-      'username': '@sarahdesigns',
       'avatar': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
       'bio': 'Interior designer passionate about modern minimalism',
       'followers': 12456,
@@ -111,14 +111,7 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Check if email already exists
-      final existingUser = _mockUsers.firstWhere(
-        (user) => user['email'] == email,
-        orElse: () => {},
-      );
+      final res = await _apiService.post('/users/register', {name, email, password});
 
       if (existingUser.isNotEmpty) {
         _errorMessage = 'Email already exists';
@@ -128,10 +121,7 @@ class AuthService extends ChangeNotifier {
       }
 
       // Check if username already exists
-      final existingUsername = _mockUsers.firstWhere(
-        (user) => user['username'] == username,
-        orElse: () => {},
-      );
+      final existingUsername = _mockUsers.firstWhere((user) => user['username'] == email, orElse: () => {});
 
       if (existingUsername.isNotEmpty) {
         _errorMessage = 'Username already taken';
@@ -146,7 +136,6 @@ class AuthService extends ChangeNotifier {
         'email': email,
         'password': password,
         'name': name,
-        'username': username.startsWith('@') ? username : '@$username',
         'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
         'bio': 'New Pinterest user',
         'followers': 0,
@@ -220,11 +209,7 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> updateProfile({
-    String? name,
-    String? bio,
-    String? website,
-  }) async {
+  Future<bool> updateProfile({String? name, String? bio, String? website}) async {
     if (_currentUser == null) return false;
 
     _isLoading = true;
@@ -239,7 +224,6 @@ class AuthService extends ChangeNotifier {
         id: _currentUser!.id,
         email: _currentUser!.email,
         name: name ?? _currentUser!.name,
-        username: _currentUser!.username,
         avatar: _currentUser!.avatar,
         bio: bio ?? _currentUser!.bio,
         followers: _currentUser!.followers,

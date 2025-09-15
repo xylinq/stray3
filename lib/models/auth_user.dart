@@ -2,7 +2,6 @@ class AuthUser {
   final String id;
   final String email;
   final String name;
-  final String username;
   final String avatar;
   final String bio;
   final int followers;
@@ -16,7 +15,6 @@ class AuthUser {
     required this.id,
     required this.email,
     required this.name,
-    required this.username,
     required this.avatar,
     required this.bio,
     required this.followers,
@@ -32,7 +30,6 @@ class AuthUser {
       id: json['id'] ?? '',
       email: json['email'] ?? '',
       name: json['name'] ?? '',
-      username: json['username'] ?? '',
       avatar: json['avatar'] ?? '',
       bio: json['bio'] ?? '',
       followers: json['followers'] ?? 0,
@@ -49,7 +46,6 @@ class AuthUser {
       'id': id,
       'email': email,
       'name': name,
-      'username': username,
       'avatar': avatar,
       'bio': bio,
       'followers': followers,

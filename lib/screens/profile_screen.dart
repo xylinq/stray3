@@ -19,8 +19,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -43,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           final savedPins = provider.getSavedPins();
           final createdPins = provider.getCreatedPins();
           final currentUser = authService.currentUser;
-          
+
           return CustomScrollView(
             slivers: [
               // Profile Header
@@ -64,7 +63,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                             child: CircleAvatar(
                               radius: 50,
                               backgroundImage: NetworkImage(
-                                currentUser?.avatar ?? 'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=200&h=200&fit=crop&crop=face',
+                                currentUser?.avatar ??
+                                    'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=200&h=200&fit=crop&crop=face',
                               ),
                             ),
                           ),
@@ -77,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Profile Name and Stats
                       GestureDetector(
                         onTap: () {
@@ -85,25 +85,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                         },
                         child: Text(
                           currentUser?.name ?? 'Your Profile',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          _showEditProfileDialog(context, authService);
-                        },
-                        child: Text(
-                          currentUser?.username ?? '@yourhandle',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
                       if (currentUser?.bio != null && currentUser!.bio.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         GestureDetector(
@@ -112,16 +97,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                           },
                           child: Text(
                             currentUser.bio,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
+                            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                             textAlign: TextAlign.center,
                           ),
                         ),
                       ],
                       const SizedBox(height: 16),
-                      
+
                       // Stats Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -138,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Action Buttons
                       Row(
                         children: [
@@ -151,9 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 backgroundColor: Colors.grey[200],
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                               ),
                               child: const Text('Edit profile'),
                             ),
@@ -167,9 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               backgroundColor: Colors.grey[200],
                               foregroundColor: Colors.black,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                             ),
                             child: const Icon(Icons.share),
                           ),
@@ -179,21 +157,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
               ),
-              
+
               // Tab Bar
               SliverToBoxAdapter(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(25),
-                  ),
+                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(25)),
                   child: TabBar(
                     controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(22),
-                    ),
+                    indicator: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(22)),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicatorPadding: const EdgeInsets.all(3),
                     labelColor: Colors.white,
@@ -208,9 +180,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
               ),
-              
+
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
-              
+
               // Tab Content
               SliverFillRemaining(
                 child: TabBarView(
@@ -218,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   children: [
                     // Saved Pins Tab
                     _buildPinsGrid(savedPins),
-                    
+
                     // Created Pins Tab - Show user created pins
                     _buildPinsGrid(createdPins, isCreateTab: true),
                   ],
@@ -245,21 +217,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       onTap: onTap,
       child: Column(
         children: [
-          Text(
-            count,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(count, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
         ],
       ),
     );
@@ -271,44 +231,24 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isCreateTab ? Icons.add_circle_outline : Icons.bookmark_outline,
-              size: 64,
-              color: Colors.grey,
-            ),
+            Icon(isCreateTab ? Icons.add_circle_outline : Icons.bookmark_outline, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
-            const Text(
-              'Nothing to show...yet!',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Nothing to show...yet!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(
               isCreateTab ? 'Pins you create will live here' : 'Pins you save will live here',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             if (isCreateTab) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CreatePostScreen(),
-                    ),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreatePostScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 ),
                 child: const Text('Create Pin'),
               ),
@@ -336,9 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _showSettingsBottomSheet(BuildContext context, AuthService authService) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -347,29 +285,17 @@ class _ProfileScreenState extends State<ProfileScreen>
             Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Settings', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.account_circle),
               title: const Text('Account settings'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AccountSettingsScreen()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountSettingsScreen()));
               },
             ),
             ListTile(
@@ -377,10 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Notifications'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const NotificationSettingsScreen()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationSettingsScreen()));
               },
             ),
             ListTile(
@@ -388,10 +311,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Privacy'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const PrivacySettingsScreen()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacySettingsScreen()));
               },
             ),
             ListTile(
@@ -399,10 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Help'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpSupportScreen()));
               },
             ),
             const Divider(),
@@ -417,10 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     title: const Text('Log out'),
                     content: const Text('Are you sure you want to log out?'),
                     actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
+                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
                         style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -445,9 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     }
                   } catch (e) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Logout failed: $e')),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
                     }
                   }
                 }
@@ -461,7 +373,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   void _showEditProfileDialog(BuildContext context, AuthService authService) {
     final nameController = TextEditingController(text: authService.currentUser?.name ?? '');
-    final usernameController = TextEditingController(text: authService.currentUser?.username ?? '');
     final bioController = TextEditingController(text: authService.currentUser?.bio ?? '');
     final websiteController = TextEditingController(text: authService.currentUser?.website ?? '');
 
@@ -475,44 +386,24 @@ class _ProfileScreenState extends State<ProfileScreen>
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: bioController,
-                decoration: const InputDecoration(
-                  labelText: 'Bio',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: websiteController,
-                decoration: const InputDecoration(
-                  labelText: 'Website',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Website', border: OutlineInputBorder()),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               await authService.updateProfile(
@@ -522,9 +413,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               );
               if (context.mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile updated successfully')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
               }
             },
             child: const Text('Save'),
@@ -537,9 +428,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _showShareOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -548,28 +437,19 @@ class _ProfileScreenState extends State<ProfileScreen>
             Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Share Profile',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Share Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.copy),
               title: const Text('Copy profile link'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile link copied to clipboard')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Profile link copied to clipboard')));
               },
             ),
             ListTile(
@@ -577,9 +457,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Share via...'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening share options...')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening share options...')));
               },
             ),
             ListTile(
@@ -599,9 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _showChangeProfilePictureDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -610,28 +486,17 @@ class _ProfileScreenState extends State<ProfileScreen>
             Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Change Profile Picture',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Change Profile Picture', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.camera_alt),
               title: const Text('Take Photo'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening camera...')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening camera...')));
               },
             ),
             ListTile(
@@ -639,9 +504,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Choose from Gallery'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening gallery...')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening gallery...')));
               },
             ),
             ListTile(
@@ -657,9 +520,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile picture removed')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture removed')));
               },
             ),
           ],
@@ -670,30 +531,22 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   void _showPhotoUrlDialog(BuildContext context) {
     final urlController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Profile Picture URL'),
         content: TextField(
           controller: urlController,
-          decoration: const InputDecoration(
-            labelText: 'Enter image URL',
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(labelText: 'Enter image URL', border: OutlineInputBorder()),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               if (urlController.text.isNotEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile picture updated')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture updated')));
               }
             },
             child: const Text('Update'),
@@ -715,25 +568,45 @@ class _ProfileScreenState extends State<ProfileScreen>
             itemCount: 5, // Sample data
             itemBuilder: (context, index) {
               final users = [
-                {'name': 'Sarah Johnson', 'username': '@sarah_j', 'avatar': 'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=100&h=100&fit=crop&crop=face'},
-                {'name': 'Michael Chen', 'username': '@mike_chen', 'avatar': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'},
-                {'name': 'Emma Wilson', 'username': '@emma_w', 'avatar': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'},
-                {'name': 'Alex Thompson', 'username': '@alex_t', 'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'},
-                {'name': 'Lisa Garcia', 'username': '@lisa_g', 'avatar': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face'},
+                {
+                  'name': 'Sarah Johnson',
+                  'username': '@sarah_j',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=100&h=100&fit=crop&crop=face',
+                },
+                {
+                  'name': 'Michael Chen',
+                  'username': '@mike_chen',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+                },
+                {
+                  'name': 'Emma Wilson',
+                  'username': '@emma_w',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+                },
+                {
+                  'name': 'Alex Thompson',
+                  'username': '@alex_t',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+                },
+                {
+                  'name': 'Lisa Garcia',
+                  'username': '@lisa_g',
+                  'avatar': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
+                },
               ];
-              
+
               final user = users[index];
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(user['avatar'] as String),
-                ),
+                leading: CircleAvatar(backgroundImage: NetworkImage(user['avatar'] as String)),
                 title: Text(user['name'] as String),
                 subtitle: Text(user['username'] as String),
                 trailing: OutlinedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Unfollowed ${user['name']}')),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unfollowed ${user['name']}')));
                   },
                   child: const Text('Following'),
                 ),
@@ -741,12 +614,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             },
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
       ),
     );
   }
@@ -763,37 +631,82 @@ class _ProfileScreenState extends State<ProfileScreen>
             itemCount: 8, // Sample data
             itemBuilder: (context, index) {
               final followers = [
-                {'name': 'John Smith', 'username': '@john_s', 'avatar': 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100&h=100&fit=crop&crop=face', 'following': false},
-                {'name': 'Maria Rodriguez', 'username': '@maria_r', 'avatar': 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=100&h=100&fit=crop&crop=face', 'following': true},
-                {'name': 'David Kim', 'username': '@david_k', 'avatar': 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face', 'following': false},
-                {'name': 'Sophie Brown', 'username': '@sophie_b', 'avatar': 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face', 'following': true},
-                {'name': 'James Wilson', 'username': '@james_w', 'avatar': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face', 'following': false},
-                {'name': 'Anna Lee', 'username': '@anna_l', 'avatar': 'https://images.unsplash.com/photo-1440133197387-5a6020d5ace2?w=100&h=100&fit=crop&crop=face', 'following': true},
-                {'name': 'Ryan Taylor', 'username': '@ryan_t', 'avatar': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face', 'following': false},
-                {'name': 'Jessica Miller', 'username': '@jessica_m', 'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face', 'following': true},
+                {
+                  'name': 'John Smith',
+                  'username': '@john_s',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100&h=100&fit=crop&crop=face',
+                  'following': false,
+                },
+                {
+                  'name': 'Maria Rodriguez',
+                  'username': '@maria_r',
+                  'avatar': 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=100&h=100&fit=crop&crop=face',
+                  'following': true,
+                },
+                {
+                  'name': 'David Kim',
+                  'username': '@david_k',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face',
+                  'following': false,
+                },
+                {
+                  'name': 'Sophie Brown',
+                  'username': '@sophie_b',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face',
+                  'following': true,
+                },
+                {
+                  'name': 'James Wilson',
+                  'username': '@james_w',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+                  'following': false,
+                },
+                {
+                  'name': 'Anna Lee',
+                  'username': '@anna_l',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1440133197387-5a6020d5ace2?w=100&h=100&fit=crop&crop=face',
+                  'following': true,
+                },
+                {
+                  'name': 'Ryan Taylor',
+                  'username': '@ryan_t',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face',
+                  'following': false,
+                },
+                {
+                  'name': 'Jessica Miller',
+                  'username': '@jessica_m',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+                  'following': true,
+                },
               ];
-              
+
               final follower = followers[index];
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(follower['avatar'] as String),
-                ),
+                leading: CircleAvatar(backgroundImage: NetworkImage(follower['avatar'] as String)),
                 title: Text(follower['name'] as String),
                 subtitle: Text(follower['username'] as String),
                 trailing: follower['following'] as bool
                     ? OutlinedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Unfollowed ${follower['name']}')),
-                          );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text('Unfollowed ${follower['name']}')));
                         },
                         child: const Text('Following'),
                       )
                     : ElevatedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Following ${follower['name']}')),
-                          );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text('Following ${follower['name']}')));
                         },
                         child: const Text('Follow'),
                       ),
@@ -801,12 +714,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             },
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
       ),
     );
   }
@@ -842,10 +750,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           width: 200,
           height: 200,
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12)),
             child: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -853,24 +758,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Icon(Icons.qr_code, size: 80, color: Colors.grey),
                   SizedBox(height: 8),
                   Text('QR Code'),
-                  Text('Feature coming soon!', 
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text('Feature coming soon!', style: TextStyle(fontSize: 12, color: Colors.grey)),
                 ],
               ),
             ),
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('QR code saved to gallery')),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('QR code saved to gallery')));
             },
             child: const Text('Save'),
           ),

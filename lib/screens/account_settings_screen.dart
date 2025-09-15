@@ -29,7 +29,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       body: Consumer<AuthService>(
         builder: (context, authService, child) {
           final user = authService.currentUser;
-          
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -62,9 +62,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 icon: Icons.verified,
                 title: 'Verification',
                 subtitle: user?.verified == true ? 'Verified' : 'Not verified',
-                trailing: user?.verified == true 
-                  ? const Icon(Icons.check_circle, color: Colors.blue)
-                  : null,
+                trailing: user?.verified == true ? const Icon(Icons.check_circle, color: Colors.blue) : null,
                 onTap: () => _showVerificationDialog(context),
               ),
               _buildSettingsTile(
@@ -109,11 +107,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       padding: const EdgeInsets.only(bottom: 12, top: 8),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
       ),
     );
   }
@@ -133,10 +127,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         leading: Icon(icon, color: textColor ?? Colors.grey[700]),
         title: Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: textColor,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w500, color: textColor),
         ),
         subtitle: Text(subtitle),
         trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
@@ -160,36 +151,24 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: bioController,
-                decoration: const InputDecoration(
-                  labelText: 'Bio',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: websiteController,
-                decoration: const InputDecoration(
-                  labelText: 'Website',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Website', border: OutlineInputBorder()),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               await authService.updateProfile(
@@ -199,9 +178,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               );
               if (context.mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile updated successfully')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
               }
             },
             child: const Text('Save'),
@@ -223,10 +202,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           children: [
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'New Email',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'New Email', border: OutlineInputBorder()),
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 16),
@@ -237,16 +213,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Verification email sent')),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verification email sent')));
             },
             child: const Text('Send Verification'),
           ),
@@ -269,48 +240,34 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           children: [
             TextField(
               controller: currentPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Current Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'Current Password', border: OutlineInputBorder()),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: newPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'New Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'New Password', border: OutlineInputBorder()),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: confirmPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Confirm New Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'Confirm New Password', border: OutlineInputBorder()),
               obscureText: true,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (newPasswordController.text == confirmPasswordController.text) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Password updated successfully')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Password updated successfully')));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Passwords do not match')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
               }
             },
             child: const Text('Update Password'),
@@ -325,18 +282,17 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Account Verification'),
-        content: const Text('Account verification helps other users know you\'re a real person. We\'ll review your request within 24-48 hours.'),
+        content: const Text(
+          'Account verification helps other users know you\'re a real person. We\'ll review your request within 24-48 hours.',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Verification request submitted')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Verification request submitted')));
             },
             child: const Text('Request Verification'),
           ),
@@ -373,9 +329,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 title: Text(languages[index]),
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Language changed to ${languages[index]}')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Language changed to ${languages[index]}')));
                 },
               );
             },
@@ -413,9 +369,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 title: Text(countries[index]),
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Country changed to ${countries[index]}')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Country changed to ${countries[index]}')));
                 },
               );
             },
@@ -430,18 +386,17 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Download Your Data'),
-        content: const Text('We\'ll prepare a file with your Pinterest data and send it to your email address. This may take up to 48 hours.'),
+        content: const Text(
+          'We\'ll prepare a file with your Pinterest data and send it to your email address. This may take up to 48 hours.',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Data download request submitted')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Data download request submitted')));
             },
             child: const Text('Request Download'),
           ),
@@ -461,12 +416,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             Text('Delete Account'),
           ],
         ),
-        content: const Text('Are you sure you want to permanently delete your account? This action cannot be undone and you will lose all your pins, boards, and data.'),
+        content: const Text(
+          'Are you sure you want to permanently delete your account? This action cannot be undone and you will lose all your pins, boards, and data.',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
@@ -494,28 +448,22 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
               obscureText: true,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               await authService.logout();
               if (context.mounted) {
                 Navigator.pushReplacementNamed(context, '/login');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Account deleted successfully')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Account deleted successfully')));
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
