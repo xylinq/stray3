@@ -62,10 +62,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             },
                             child: CircleAvatar(
                               radius: 50,
-                              backgroundImage: NetworkImage(
-                                currentUser?.avatar ??
-                                    'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=200&h=200&fit=crop&crop=face',
-                              ),
+                              backgroundColor: Colors.brown.shade800,
+                              child: const Text('AH')
                             ),
                           ),
                           IconButton(
@@ -89,14 +87,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         ),
                       ),
                       const SizedBox(height: 8),
-                      if (currentUser?.bio != null && currentUser!.bio.isNotEmpty) ...[
+                      if (true) ...[
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () {
                             _showEditProfileDialog(context, authService);
                           },
                           child: Text(
-                            currentUser.bio,
+                            'bio',
                             style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                             textAlign: TextAlign.center,
                           ),
@@ -108,10 +106,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildStatColumn('Following', currentUser?.following.toString() ?? '234', () {
+                          _buildStatColumn('Following', '234', () {
                             _showFollowingList(context);
                           }),
-                          _buildStatColumn('Followers', _formatNumber(currentUser?.followers ?? 1200), () {
+                          _buildStatColumn('Followers', _formatNumber(1200), () {
                             _showFollowersList(context);
                           }),
                           _buildStatColumn('Pins', savedPins.length.toString(), () {
@@ -373,8 +371,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   void _showEditProfileDialog(BuildContext context, AuthService authService) {
     final nameController = TextEditingController(text: authService.currentUser?.name ?? '');
-    final bioController = TextEditingController(text: authService.currentUser?.bio ?? '');
-    final websiteController = TextEditingController(text: authService.currentUser?.website ?? '');
+    final bioController = TextEditingController(text: 'bio');
+    final websiteController = TextEditingController(text: 'website');
 
     showDialog(
       context: context,

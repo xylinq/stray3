@@ -19,38 +19,6 @@ class AuthService extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  // Mock users database
-  final List<Map<String, dynamic>> _mockUsers = [
-    {
-      'id': '1',
-      'email': 'demo@pinterest.com',
-      'password': 'password123',
-      'name': 'Demo User',
-      'avatar': 'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=200&h=200&fit=crop&crop=face',
-      'bio': 'Welcome to Pinterest clone!',
-      'followers': 1234,
-      'following': 567,
-      'pins': 89,
-      'verified': true,
-      'website': 'www.pinterest.com',
-      'createdAt': '2024-01-01T00:00:00.000Z',
-    },
-    {
-      'id': '2',
-      'email': 'sarah@email.com',
-      'password': 'sarah123',
-      'name': 'Sarah Johnson',
-      'avatar': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-      'bio': 'Interior designer passionate about modern minimalism',
-      'followers': 12456,
-      'following': 234,
-      'pins': 189,
-      'verified': true,
-      'website': 'www.sarahdesigns.com',
-      'createdAt': '2023-06-15T00:00:00.000Z',
-    },
-  ];
-
   Future<void> initialize() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -72,23 +40,16 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 2));
+      Map res = await _apiService.post('users/login', {'email': email, 'password': password});
 
-      // Find user in mock database
-      final userMap = _mockUsers.firstWhere(
-        (user) => user['email'] == email && user['password'] == password,
-        orElse: () => {},
-      );
-
-      if (userMap.isEmpty) {
-        _errorMessage = 'Invalid email or password';
+      if (res['code'] != 200) {
+         _errorMessage = res['msg'];
         _isLoading = false;
         notifyListeners();
         return false;
       }
 
-      _currentUser = AuthUser.fromJson(userMap);
+      _currentUser = AuthUser.fromJson(res['data']);
 
       // Save to shared preferences
       final prefs = await SharedPreferences.getInstance();
@@ -98,7 +59,7 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Login failed. Please try again.';
+      _errorMessage = '登录失败，请重试';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -111,43 +72,32 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await _apiService.post('/users/register', {name, email, password});
+      Map res = await _apiService.post('users/register', {'name': name, 'email': email, 'password': password});
 
-      if (existingUser.isNotEmpty) {
-        _errorMessage = 'Email already exists';
+      if (res['code'] != 200) {
+        _errorMessage = res['msg'];
         _isLoading = false;
         notifyListeners();
         return false;
       }
 
-      // Check if username already exists
-      final existingUsername = _mockUsers.firstWhere((user) => user['username'] == email, orElse: () => {});
+      // // Create new user
+      // final newUser = {
+      //   'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      //   'email': email,
+      //   'password': password,
+      //   'name': name,
+      //   'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
+      //   'bio': 'New Pinterest user',
+      //   'followers': 0,
+      //   'following': 0,
+      //   'pins': 0,
+      //   'verified': false,
+      //   'website': '',
+      //   'createdAt': DateTime.now().toIso8601String(),
+      // };
 
-      if (existingUsername.isNotEmpty) {
-        _errorMessage = 'Username already taken';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
-      // Create new user
-      final newUser = {
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'email': email,
-        'password': password,
-        'name': name,
-        'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
-        'bio': 'New Pinterest user',
-        'followers': 0,
-        'following': 0,
-        'pins': 0,
-        'verified': false,
-        'website': '',
-        'createdAt': DateTime.now().toIso8601String(),
-      };
-
-      _mockUsers.add(newUser);
-      _currentUser = AuthUser.fromJson(newUser);
+      _currentUser = AuthUser.fromJson(res['data']);
 
       // Save to shared preferences
       final prefs = await SharedPreferences.getInstance();
@@ -157,7 +107,7 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Registration failed. Please try again.';
+      _errorMessage = '注册失败，请重试！';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -182,22 +132,11 @@ class AuthService extends ChangeNotifier {
     try {
       // Simulate network delay
       await Future.delayed(const Duration(seconds: 2));
-
-      // Check if email exists
-      final userExists = _mockUsers.any((user) => user['email'] == email);
-
-      if (!userExists) {
-        _errorMessage = 'Email not found';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to send reset email';
+      _errorMessage = '发送重置密码邮件出错';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -224,13 +163,7 @@ class AuthService extends ChangeNotifier {
         id: _currentUser!.id,
         email: _currentUser!.email,
         name: name ?? _currentUser!.name,
-        avatar: _currentUser!.avatar,
-        bio: bio ?? _currentUser!.bio,
-        followers: _currentUser!.followers,
-        following: _currentUser!.following,
-        pins: _currentUser!.pins,
-        verified: _currentUser!.verified,
-        website: website ?? _currentUser!.website,
+        role: _currentUser!.role,
         createdAt: _currentUser!.createdAt,
       );
 

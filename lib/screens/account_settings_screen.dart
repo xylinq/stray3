@@ -61,8 +61,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               _buildSettingsTile(
                 icon: Icons.verified,
                 title: 'Verification',
-                subtitle: user?.verified == true ? 'Verified' : 'Not verified',
-                trailing: user?.verified == true ? const Icon(Icons.check_circle, color: Colors.blue) : null,
+                subtitle: 'Verified',
+                trailing: const Icon(Icons.check_circle, color: Colors.blue),
                 onTap: () => _showVerificationDialog(context),
               ),
               _buildSettingsTile(
@@ -138,8 +138,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
   void _showProfileDialog(BuildContext context, AuthService authService) {
     final nameController = TextEditingController(text: authService.currentUser?.name);
-    final bioController = TextEditingController(text: authService.currentUser?.bio);
-    final websiteController = TextEditingController(text: authService.currentUser?.website);
+    final bioController = TextEditingController(text: 'authService.currentUser?.bio');
+    final websiteController = TextEditingController(text: 'authService.currentUser?.website');
 
     showDialog(
       context: context,
