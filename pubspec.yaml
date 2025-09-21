@@ -15,6 +15,10 @@ dependencies:
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.4
   http: ^1.0.0
+  ez_circle_avatar: ^0.0.3
+  tencentcloud_cos_sdk_plugin: ^1.2.6
+  image_picker: ^1.2.0
+  crypto: ^3.0.6
 
 dev_dependencies:
   flutter_test:

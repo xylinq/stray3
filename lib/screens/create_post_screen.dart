@@ -1,7 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/pinterest_provider.dart';
-import '../models/pin.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:tencentcloud_cos_sdk_plugin/cos.dart';
+import 'package:tencentcloud_cos_sdk_plugin/pigeon.dart';
+import 'package:tencentcloud_cos_sdk_plugin/cos_transfer_manger.dart';
+import 'package:tencentcloud_cos_sdk_plugin/transfer_task.dart';
+import 'package:crypto/crypto.dart';
+import '../providers/stray_provider.dart';
+import '../services/auth_service.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key});
@@ -11,19 +18,28 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _tagsController = TextEditingController();
-  
+  final _descController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _pickerController = TextEditingController();
+  final ImagePicker _imgPicker = ImagePicker();
+
   String? _selectedImageUrl;
-  String _selectedCategory = 'Design';
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    final authService = Provider.of<AuthService>(context, listen: false);
+    if (authService.currentUser != null) {
+      _pickerController.text = authService.currentUser!.name;
+    }
+  }
+
+  @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _tagsController.dispose();
+    _descController.dispose();
+    _locationController.dispose();
+    _pickerController.dispose();
     super.dispose();
   }
 
@@ -31,25 +47,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Pin'),
+        title: const Text('登记新失物'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _createPost,
-            child: _isLoading 
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+            child: _isLoading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Text(
-                    'Publish',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    '提交',
+                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                   ),
           ),
         ],
@@ -62,19 +71,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Image Selection
-                const Text(
-                  'Choose an Image',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('拍照或从相册选择', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                
+
                 // Selected Image Preview
                 if (_selectedImageUrl != null) ...[
                   Container(
-                    height: 200,
+                    height: 300,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -88,170 +91,93 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[200],
-                            child: const Icon(
-                              Icons.error,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
+                            child: const Icon(Icons.error, size: 50, color: Colors.grey),
                           );
                         },
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                ],
-                
-                // Image Selection Grid
-                SizedBox(
-                  height: 200,
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: provider.getSampleImageUrls().length,
-                    itemBuilder: (context, index) {
-                      final imageUrl = provider.getSampleImageUrls()[index];
-                      final isSelected = _selectedImageUrl == imageUrl;
-                      
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImageUrl = imageUrl;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: isSelected ? Colors.red : Colors.grey[300]!,
-                              width: isSelected ? 3 : 1,
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(7),
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(
-                                    Icons.error,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                            ),
+                ] else ...[
+                  // Image Upload Button
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            _selectImageFromCamera();
+                          },
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('拍照'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.all(16),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            _selectImageFromGallery();
+                          },
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('从相册选择'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[300],
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.all(16),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Title Input
-                const Text(
-                  'Title',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                ],
+
+                const SizedBox(height: 16),
+
+                // Desc input
+                const Text('物品描述', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _titleController,
+                  controller: _descController,
                   decoration: InputDecoration(
-                    hintText: 'Add a title for your pin',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    hintText: '输入丢失物品的描述',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   maxLines: 1,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
-                // Description Input
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+
+                // Location Input
+                const Text('拾取地点', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _descriptionController,
+                  controller: _locationController,
                   decoration: InputDecoration(
-                    hintText: 'Tell everyone what your pin is about',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    hintText: '输入在哪里拾取的',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   maxLines: 3,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
-                // Category Selection
-                const Text(
-                  'Category',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  items: provider.getPostCategories().map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedCategory = value;
-                      });
-                    }
-                  },
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Tags Input
-                const Text(
-                  'Tags',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+
+                // Picker Input
+                const Text('拾取人', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _tagsController,
+                  controller: _pickerController,
                   decoration: InputDecoration(
-                    hintText: 'Add tags separated by commas (e.g., design, inspiration, art)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    hintText: '输入是谁拾取的',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   maxLines: 2,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Create Button
                 SizedBox(
                   width: double.infinity,
@@ -259,21 +185,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _createPost,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Create Pin',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        : const Text('提交', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -284,18 +202,125 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     );
   }
 
+  Future<void> _selectImageFromCamera() async {
+    try {
+      final XFile? pickedFile = await _imgPicker.pickImage(source: ImageSource.camera, imageQuality: 80);
+
+      if (pickedFile != null) {
+        // Upload to Tencent COS
+        await _uploadImageToCOS(File(pickedFile.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error capturing image: $e')));
+      }
+    }
+  }
+
+  Future<void> _selectImageFromGallery() async {
+    try {
+      final XFile? pickedFile = await _imgPicker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+
+      if (pickedFile != null) {
+        // Upload to Tencent COS
+        await _uploadImageToCOS(File(pickedFile.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error selecting image from gallery: $e')));
+      }
+    }
+  }
+
+  Future<String?> _uploadImageToCOS(File imageFile) async {
+    String secretId = "AKIDIZfYHyY3KdrulPtAGArLcfV8YlkX7Ufe";
+    String secretKey = "rX3MeolU2NWR9g5NTWO9tX0Hct0xhEXd";
+    String region = "ap-shanghai";
+
+    try {
+      await Cos().initWithPlainSecret(secretId, secretKey);
+
+      CosXmlServiceConfig serviceConfig = CosXmlServiceConfig(region: region, isDebuggable: true, isHttps: true);
+
+      await Cos().registerDefaultService(serviceConfig);
+
+      TransferConfig transferConfig = TransferConfig(
+        forceSimpleUpload: false,
+        enableVerification: true,
+        divisionForUpload: 2097152, // 设置大于等于 2M 的文件进行分块上传
+        sliceSizeForUpload: 1048576, //设置默认分块大小为 1M
+      );
+
+      await Cos().registerDefaultTransferManger(serviceConfig, transferConfig);
+
+      CosTransferManger transferManager = Cos().getDefaultTransferManger();
+      String bucket = "zp-1259132592";
+      String fileHash = await _generateFileMD5(imageFile);
+      String fileExtension = imageFile.path.split('.').last;
+      String cosPath = 'images/$fileHash.$fileExtension';
+
+      await transferManager.upload(
+        bucket,
+        cosPath,
+        filePath: imageFile.path,
+        resultListener: ResultListener(
+          // 上传成功回调
+          (Map<String?, String?>? header, CosXmlResult? result) {
+            if (result?.accessUrl != null && mounted) {
+              setState(() {
+                _selectedImageUrl = result?.accessUrl;
+              });
+            }
+          },
+          // 上传失败回调
+          (clientException, serviceException) {
+            if (clientException != null) print(clientException);
+            if (serviceException != null) print(serviceException);
+          },
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
+      }
+    }
+    return null;
+  }
+
+  Future<String> _generateFileMD5(File file) async {
+    try {
+      // Read file as bytes
+      List<int> bytes = await file.readAsBytes();
+
+      // Generate MD5 hash
+      Digest digest = md5.convert(bytes);
+
+      // Return hash as hex string
+      return digest.toString();
+    } catch (e) {
+      // Fallback to timestamp-based name if MD5 fails
+      return DateTime.now().millisecondsSinceEpoch.toString();
+    }
+  }
+
   Future<void> _createPost() async {
     if (_selectedImageUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an image')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请拍照或从相册选取一张照片')));
       return;
     }
-    
-    if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title')),
-      );
+
+    if (_descController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入物品描述')));
+      return;
+    }
+
+    if (_locationController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入拾取地点')));
+      return;
+    }
+
+    if (_pickerController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入拾取人')));
       return;
     }
 
@@ -304,36 +329,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
 
     try {
-      final tags = _tagsController.text
-          .split(',')
-          .map((tag) => tag.trim())
-          .where((tag) => tag.isNotEmpty)
-          .toList();
-
       final provider = Provider.of<PinterestProvider>(context, listen: false);
-      
-      await provider.createPost(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        imageUrl: _selectedImageUrl!,
-        tags: tags.isEmpty ? ['created'] : tags,
-        category: _selectedCategory,
-      );
+
+      // await provider.createPost(
+      //   title: _titleController.text.trim(),
+      //   description: _descriptionController.text.trim(),
+      //   imageUrl: _selectedImageUrl!,
+      //   tags: tags.isEmpty ? ['created'] : tags,
+      //   category: _selectedCategory,
+      // );
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pin created successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('失物提交成功!'), backgroundColor: Colors.green));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating pin: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('失物提交失败: $e')));
       }
     } finally {
       if (mounted) {

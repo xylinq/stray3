@@ -43,7 +43,7 @@ class AuthService extends ChangeNotifier {
       Map res = await _apiService.post('users/login', {'email': email, 'password': password});
 
       if (res['code'] != 200) {
-         _errorMessage = res['msg'];
+        _errorMessage = res['msg'];
         _isLoading = false;
         notifyListeners();
         return false;
@@ -80,22 +80,6 @@ class AuthService extends ChangeNotifier {
         notifyListeners();
         return false;
       }
-
-      // // Create new user
-      // final newUser = {
-      //   'id': DateTime.now().millisecondsSinceEpoch.toString(),
-      //   'email': email,
-      //   'password': password,
-      //   'name': name,
-      //   'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
-      //   'bio': 'New Pinterest user',
-      //   'followers': 0,
-      //   'following': 0,
-      //   'pins': 0,
-      //   'verified': false,
-      //   'website': '',
-      //   'createdAt': DateTime.now().toIso8601String(),
-      // };
 
       _currentUser = AuthUser.fromJson(res['data']);
 

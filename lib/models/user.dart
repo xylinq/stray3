@@ -1,51 +1,23 @@
 class User {
-  final String id;
+  final int id;
+  final String email;
   final String name;
-  final String bio;
-  final String avatar;
-  final int followers;
-  final int following;
-  final int pins;
-  final bool verified;
-  final String website;
+  final String role;
+  final DateTime createdAt;
 
-  User({
-    required this.id,
-    required this.name,
-    required this.bio,
-    required this.avatar,
-    required this.followers,
-    required this.following,
-    required this.pins,
-    required this.verified,
-    required this.website,
-  });
+  User({required this.id, required this.email, required this.name, required this.role, required this.createdAt});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] ?? '',
+      email: json['email'] ?? '',
       name: json['name'] ?? '',
-      bio: json['bio'] ?? '',
-      avatar: json['avatar'] ?? '',
-      followers: json['followers'] ?? 0,
-      following: json['following'] ?? 0,
-      pins: json['pins'] ?? 0,
-      verified: json['verified'] ?? false,
-      website: json['website'] ?? '',
+      role: json['role'] ?? '',
+      createdAt: json['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['createdAt']) : DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'bio': bio,
-      'avatar': avatar,
-      'followers': followers,
-      'following': following,
-      'pins': pins,
-      'verified': verified,
-      'website': website,
-    };
+    return {'id': id, 'email': email, 'name': name, 'role': role, 'createdAt': createdAt.microsecondsSinceEpoch};
   }
 }

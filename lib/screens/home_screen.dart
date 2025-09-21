@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
-import '../providers/pinterest_provider.dart';
+import '../providers/stray_provider.dart';
 import '../widgets/pin_card.dart';
 import '../utils/responsive_helper.dart';
-import 'search_screen.dart';
 import 'profile_screen.dart';
 import 'create_post_screen.dart';
-import 'messages_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,13 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = index;
           });
         },
-        children: [
-          PinterestHomeTab(),
-          SearchScreen(),
-          CreatePostScreen(),
-          MessagesScreen(),
-          ProfileScreen(),
-        ],
+        children: [PinterestHomeTab(), CreatePostScreen(), ProfileScreen()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -51,11 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _currentIndex = index;
           });
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
+          _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
@@ -63,31 +51,13 @@ class _HomeScreenState extends State<HomeScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            activeIcon: Icon(Icons.search),
-            label: 'Search',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home_filled), label: '首页'),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_circle_outline),
             activeIcon: Icon(Icons.add_circle),
-            label: 'Create',
+            label: '创建',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: '我的'),
         ],
       ),
     );
@@ -133,9 +103,7 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
       child: Consumer<PinterestProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final pins = provider.pins;
@@ -149,15 +117,7 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Pinterest',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    children: [const Text('周小失物认领', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))],
                   ),
                 ),
               ),
@@ -172,8 +132,8 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
                       final category = categories[index];
-                      final isSelected = (category == 'All' && selectedCategory.isEmpty) ||
-                          category == selectedCategory;
+                      final isSelected =
+                          (category == 'All' && selectedCategory.isEmpty) || category == selectedCategory;
 
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
