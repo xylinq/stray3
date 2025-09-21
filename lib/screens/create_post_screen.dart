@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tencentcloud_cos_sdk_plugin/cos.dart';
 import 'package:tencentcloud_cos_sdk_plugin/pigeon.dart';
 import 'package:tencentcloud_cos_sdk_plugin/cos_transfer_manger.dart';
-import 'package:tencentcloud_cos_sdk_plugin/transfer_task.dart';
 import 'package:crypto/crypto.dart';
 import '../providers/stray_provider.dart';
 import '../services/auth_service.dart';
@@ -63,7 +62,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ),
         ],
       ),
-      body: Consumer<PinterestProvider>(
+      body: Consumer<StrayProvider>(
         builder: (context, provider, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -329,15 +328,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
 
     try {
-      final provider = Provider.of<PinterestProvider>(context, listen: false);
+      final provider = Provider.of<StrayProvider>(context, listen: false);
 
-      // await provider.createPost(
-      //   title: _titleController.text.trim(),
-      //   description: _descriptionController.text.trim(),
-      //   imageUrl: _selectedImageUrl!,
-      //   tags: tags.isEmpty ? ['created'] : tags,
-      //   category: _selectedCategory,
-      // );
+      await provider.createPost(
+        img: _selectedImageUrl!,
+        desc: _descController.text.trim(),
+        location: _locationController.text.trim(),
+        picker: _pickerController.text.trim(),
+      );
 
       if (mounted) {
         Navigator.pop(context);

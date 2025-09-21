@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
-import '../providers/stray_provider.dart';
-import '../widgets/pin_card.dart';
+import '../providers/pinterest_provider.dart';
+import '../widgets/thing_card.dart';
 import '../utils/responsive_helper.dart';
 import 'profile_screen.dart';
 import 'create_post_screen.dart';
@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = index;
           });
         },
-        children: [PinterestHomeTab(), CreatePostScreen(), ProfileScreen()],
+        children: [StrayHomeTab(), CreatePostScreen(), ProfileScreen()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -64,31 +64,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class PinterestHomeTab extends StatefulWidget {
-  const PinterestHomeTab({super.key});
+class StrayHomeTab extends StatefulWidget {
+  const StrayHomeTab({super.key});
 
   @override
-  State<PinterestHomeTab> createState() => _PinterestHomeTabState();
+  State<StrayHomeTab> createState() => _StrayHomeTabState();
 }
 
-class _PinterestHomeTabState extends State<PinterestHomeTab> {
+class _StrayHomeTabState extends State<StrayHomeTab> {
   final ScrollController _scrollController = ScrollController();
-  List<String> categories = [];
-  String selectedCategory = '';
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadCategories();
-    });
-  }
-
-  void _loadCategories() {
-    final provider = Provider.of<PinterestProvider>(context, listen: false);
-    setState(() {
-      categories = ['All', ...provider.getCategories()];
-    });
   }
 
   @override
@@ -122,52 +110,9 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                 ),
               ),
 
-              // Category Filter
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected =
-                          (category == 'All' && selectedCategory.isEmpty) || category == selectedCategory;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              if (category == 'All') {
-                                selectedCategory = '';
-                                provider.clearFilters();
-                              } else {
-                                selectedCategory = category;
-                                provider.filterByCategory(category);
-                              }
-                            });
-                          },
-                          backgroundColor: Colors.grey[200],
-                          selectedColor: Colors.black,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          checkmarkColor: Colors.white,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-              // Pinterest Grid
+              // Grid
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: ResponsiveHelper.getHorizontalPadding(context)),
                 sliver: SliverMasonryGrid.count(
@@ -177,7 +122,7 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                   childCount: pins.length,
                   itemBuilder: (context, index) {
                     final pin = pins[index];
-                    return PinCard(pin: pin);
+                    return ThingCard(thing: pin);
                   },
                 ),
               ),
