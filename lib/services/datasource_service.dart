@@ -129,8 +129,10 @@ class DatasourceService {
       'userId': _authService.currentUser!.id,
     });
 
+    final newThing = Thing.fromJson(res['data']);
+
     // _pins.insert(0, newPin); // Add to beginning of list
     // await _saveUserData(); // Persist to storage
-    return res['data'];
+    return newThing;
   }
 }

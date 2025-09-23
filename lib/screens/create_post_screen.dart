@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:stray/services/api_service.dart';
 import 'package:tencentcloud_cos_sdk_plugin/cos.dart';
 import 'package:tencentcloud_cos_sdk_plugin/pigeon.dart';
 import 'package:tencentcloud_cos_sdk_plugin/cos_transfer_manger.dart';
@@ -21,6 +22,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final _locationController = TextEditingController();
   final _pickerController = TextEditingController();
   final ImagePicker _imgPicker = ImagePicker();
+  final _apiService = ApiService();
 
   String? _selectedImageUrl;
   bool _isLoading = false;
@@ -231,59 +233,66 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     }
   }
 
-  Future<String?> _uploadImageToCOS(File imageFile) async {
-    String secretId = "AKIDIZfYHyY3KdrulPtAGArLcfV8YlkX7Ufe";
-    String secretKey = "rX3MeolU2NWR9g5NTWO9tX0Hct0xhEXd";
-    String region = "ap-shanghai";
+  Future<void> _uploadImageToCOS(File imageFile) async {
+    final authService = Provider.of<AuthService>(context, listen: false);
 
-    try {
-      await Cos().initWithPlainSecret(secretId, secretKey);
-
-      CosXmlServiceConfig serviceConfig = CosXmlServiceConfig(region: region, isDebuggable: true, isHttps: true);
-
-      await Cos().registerDefaultService(serviceConfig);
-
-      TransferConfig transferConfig = TransferConfig(
-        forceSimpleUpload: false,
-        enableVerification: true,
-        divisionForUpload: 2097152, // 设置大于等于 2M 的文件进行分块上传
-        sliceSizeForUpload: 1048576, //设置默认分块大小为 1M
-      );
-
-      await Cos().registerDefaultTransferManger(serviceConfig, transferConfig);
-
-      CosTransferManger transferManager = Cos().getDefaultTransferManger();
-      String bucket = "zp-1259132592";
-      String fileHash = await _generateFileMD5(imageFile);
-      String fileExtension = imageFile.path.split('.').last;
-      String cosPath = 'images/$fileHash.$fileExtension';
-
-      await transferManager.upload(
-        bucket,
-        cosPath,
-        filePath: imageFile.path,
-        resultListener: ResultListener(
-          // 上传成功回调
-          (Map<String?, String?>? header, CosXmlResult? result) {
-            if (result?.accessUrl != null && mounted) {
-              setState(() {
-                _selectedImageUrl = result?.accessUrl;
-              });
-            }
-          },
-          // 上传失败回调
-          (clientException, serviceException) {
-            if (clientException != null) print(clientException);
-            if (serviceException != null) print(serviceException);
-          },
-        ),
-      );
-    } catch (e) {
+    final credRes = await _apiService.post('tencent/getCredential', {'userId': authService.currentUser!.id});
+    if (credRes['code'] != 200) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('获取上传凭证失败')));
       }
+      return;
     }
-    return null;
+
+    // 初始化密钥
+    SessionQCloudCredentials sessionQCloudCredentials = SessionQCloudCredentials(
+      secretId: credRes['data']['tmpSecretId'],
+      secretKey: credRes['data']['tmpSecretKey'],
+      token: credRes['data']['token'],
+      startTime: credRes['data']['expiredTime'] - 3600, // 提前一小时开始使用
+      expiredTime: credRes['data']['expiredTime'],
+    );
+
+    // 注册 COS 服务
+    String region = "ap-shanghai";
+    CosXmlServiceConfig serviceConfig = CosXmlServiceConfig(region: region, isDebuggable: true, isHttps: true);
+    await Cos().registerDefaultService(serviceConfig);
+    TransferConfig transferConfig = TransferConfig(
+      forceSimpleUpload: false,
+      enableVerification: true,
+      divisionForUpload: 4194304, // 设置大于等于 2M 的文件进行分块上传
+      sliceSizeForUpload: 1048576, //设置默认分块大小为 1M
+    );
+    await Cos().registerDefaultTransferManger(serviceConfig, transferConfig);
+
+    // 上传对象
+    CosTransferManger transferManager = Cos().getDefaultTransferManger();
+    String bucket = "zp-1259132592";
+    String fileHash = await _generateFileMD5(imageFile);
+    String fileExtension = imageFile.path.split('.').last;
+    String cosPath = 'images/$fileHash.$fileExtension';
+
+    await transferManager.upload(
+      filePath: imageFile.path,
+      bucket,
+      cosPath,
+      sessionCredentials: sessionQCloudCredentials,
+      resultListener: ResultListener(
+        // 上传成功回调
+        (Map<String?, String?>? header, CosXmlResult? result) {
+          if (result?.accessUrl != null && mounted) {
+            setState(() {
+              _selectedImageUrl = result?.accessUrl;
+            });
+          }
+        },
+        // 上传失败回调
+        (clientException, serviceException) {
+          if (clientException != null) print(clientException);
+          if (serviceException != null) print(serviceException);
+        },
+      ),
+    );
   }
 
   Future<String> _generateFileMD5(File file) async {
